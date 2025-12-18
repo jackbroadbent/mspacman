@@ -33,7 +33,7 @@ export default function LoginPage() {
     <div className="login-container">
       <div className="login-box">
         <h1>PACKMUNDERMAN'S</h1>
-        <div className="subtitle">Loggington Enhanced</div>
+        <div className="subtitle">LOGGINGTON ENHANCED</div>
         <p>Enter password to continue</p>
         <form onSubmit={handleSubmit}>
           <input
@@ -66,17 +66,21 @@ export default function LoginPage() {
           border: 2px solid #FFD700;
         }
         h1 {
-          color: #FFD700;
+          background: linear-gradient(90deg, #ff6b6b, #ffd93d);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
           margin: 0;
           font-size: 1.8rem;
-          text-transform: uppercase;
-          letter-spacing: 2px;
+          font-weight: bold;
+          letter-spacing: 1px;
         }
         .subtitle {
-          color: #FF69B4;
-          font-size: 1.2rem;
-          margin-bottom: 1rem;
-          font-style: italic;
+          color: #888;
+          font-size: 0.9rem;
+          margin-bottom: 1.5rem;
+          letter-spacing: 3px;
+          text-transform: uppercase;
         }
         p {
           color: #ccc;

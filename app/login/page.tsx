@@ -32,7 +32,8 @@ export default function LoginPage() {
   return (
     <div className="login-container">
       <div className="login-box">
-        <h1>Ms. Pac-Man Score Logger</h1>
+        <h1>PACKMUNDERMAN'S</h1>
+        <div className="subtitle">Loggington Enhanced</div>
         <p>Enter password to continue</p>
         <form onSubmit={handleSubmit}>
           <input
@@ -66,8 +67,16 @@ export default function LoginPage() {
         }
         h1 {
           color: #FFD700;
-          margin: 0 0 0.5rem 0;
-          font-size: 1.5rem;
+          margin: 0;
+          font-size: 1.8rem;
+          text-transform: uppercase;
+          letter-spacing: 2px;
+        }
+        .subtitle {
+          color: #FF69B4;
+          font-size: 1.2rem;
+          margin-bottom: 1rem;
+          font-style: italic;
         }
         p {
           color: #ccc;

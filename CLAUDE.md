@@ -51,6 +51,22 @@ npm run lint   # Run ESLint
 - CSS custom properties defined in `app/globals.css`
 - Selected elements have yellow glow effect
 
+## Authentication
+
+Password protection via Next.js middleware:
+- `middleware.ts` - Redirects unauthenticated users to `/login`
+- `app/login/page.tsx` - Password entry UI
+- `app/api/auth/route.ts` - Validates password against `SITE_PASSWORD` env var, sets httpOnly cookie (30 days)
+
+Password stored in environment variables only (not in code).
+
+## Deployment
+
+- **GitHub:** https://github.com/jackbroadbent/mspacman
+- **Vercel:** https://packmuderman.vercel.app
+- Deploy: `npx vercel --prod --yes`
+- Env vars managed via `npx vercel env` commands
+
 ## Current Status
 
-Phase 2-3 complete (static UI + interactivity). Next: GitHub setup, Vercel deployment, Supabase integration.
+GitHub and Vercel deployed with password protection. Next: Supabase integration.

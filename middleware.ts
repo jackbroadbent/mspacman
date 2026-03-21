@@ -4,8 +4,16 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.get('site-auth')?.value === 'authenticated'
 
-  // Allow access to login page and API
+  // Allow access to login page and auth API
   if (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/api/auth') {
+    return NextResponse.next()
+  }
+
+  // API routes return 401 JSON instead of redirect
+  if (request.nextUrl.pathname.startsWith('/api/')) {
+    if (!isAuthenticated) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     return NextResponse.next()
   }
 

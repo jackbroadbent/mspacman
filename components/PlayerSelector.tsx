@@ -7,14 +7,12 @@ interface PlayerSelectorProps {
   players: Player[]
   selectedPlayerId: string | null
   onSelect: (playerId: string) => void
-  loggedInPlayerId?: string
 }
 
 export function PlayerSelector({
   players,
   selectedPlayerId,
   onSelect,
-  loggedInPlayerId,
 }: PlayerSelectorProps) {
   const [showMore, setShowMore] = useState(false)
 
@@ -34,9 +32,6 @@ export function PlayerSelector({
             onClick={() => onSelect(player.id)}
           >
             {player.name}
-            {loggedInPlayerId === player.id && (
-              <span style={{ marginLeft: '4px', opacity: 0.6 }}>*</span>
-            )}
           </button>
         ))}
       </div>

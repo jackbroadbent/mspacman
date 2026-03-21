@@ -1,14 +1,21 @@
 'use client'
 
 import { useState } from 'react'
-import { FIXED_LEVELS, FRUITS, MAZES, getMaze, LEVEL_TIERS, FruitKey, MazeKey, LevelFruits } from '@/lib/constants'
-import { FruitPicker } from './FruitPicker'
+import { FIXED_LEVELS, MAZES, getMaze, LEVEL_TIERS, FruitKey, MazeKey, LevelFruits, LevelFruitCounts } from '@/lib/constants'
+import { FruitCountPicker } from './FruitPicker'
+import { FruitIcon } from './PixelFruits'
 
 interface LevelSelectorProps {
   selectedLevel: number | null
   levelFruits: LevelFruits
   onLevelSelect: (level: number) => void
-  onLevelFruitsChange: (level: number, slotIndex: 0 | 1, fruit: FruitKey | null) => void
+  onLevelFruitsChange: (level: number, fruitCounts: LevelFruitCounts) => void
+}
+
+// Helper to get total fruit count for a level
+function getTotalFruitCount(fruitCounts: LevelFruitCounts | undefined): number {
+  if (!fruitCounts) return 0
+  return (Object.values(fruitCounts) as number[]).reduce((sum, count) => sum + (count || 0), 0)
 }
 
 // Group levels by maze
@@ -76,8 +83,8 @@ export function LevelSelector({
         style={{ borderColor: mazeColor }}
       >
         <span className="level-num">{level}</span>
-        <span className="level-fruit" style={fruit ? {} : { opacity: 0.5, color: 'var(--text)' }}>
-          {fruit ? FRUITS[fruit].emoji : '?'}
+        <span className="level-fruit" style={fruit ? {} : { opacity: 0.5 }}>
+          {fruit ? <FruitIcon fruit={fruit} size={20} /> : '?'}
         </span>
       </button>
     )
@@ -149,28 +156,31 @@ export function LevelSelector({
           {Array.from({ length: selectedLevel - 7 }, (_, i) => i + 8).map(level => {
             const maze = getMaze(level)
             const mazeColor = MAZES[maze].color
-            const fruits = levelFruits[level] || [null, null]
+            const fruitCounts = levelFruits[level] || {}
             const isLastLevel = level === selectedLevel
+            const totalCount = getTotalFruitCount(fruitCounts)
+            const isComplete = totalCount === 2
+            const hasError = !isLastLevel && totalCount > 0 && totalCount !== 2
 
             return (
               <div key={level} className="level-fruit-row">
-                <div className="level-fruit-label" style={{ borderLeftColor: mazeColor }}>
+                <div
+                  className="level-fruit-label"
+                  style={{
+                    borderLeftColor: mazeColor,
+                    opacity: isComplete || isLastLevel ? 1 : 0.7
+                  }}
+                >
                   <span className="level-fruit-num">{level}</span>
+                  {isLastLevel && (
+                    <span className="optional-tag">opt</span>
+                  )}
                 </div>
-                <div className="level-fruit-slots">
-                  <FruitPicker
-                    selectedFruit={fruits[0]}
-                    onSelect={(fruit) => onLevelFruitsChange(level, 0, fruit)}
-                    allowClear={isLastLevel}
-                    compact
-                  />
-                  <FruitPicker
-                    selectedFruit={fruits[1]}
-                    onSelect={(fruit) => onLevelFruitsChange(level, 1, fruit)}
-                    allowClear={isLastLevel}
-                    compact
-                  />
-                </div>
+                <FruitCountPicker
+                  fruitCounts={fruitCounts}
+                  onCountChange={(newCounts) => onLevelFruitsChange(level, newCounts)}
+                  isLastLevel={isLastLevel}
+                />
               </div>
             )
           })}

@@ -2,26 +2,39 @@ name: Keep Supabase Alive
 
 on:
   schedule:
-    # Runs every 4 days at 8:00 UTC
-    - cron: '0 8 */4 * *'
+    # Runs daily at 8:00 UTC
+    - cron: '0 8 * * *'
   workflow_dispatch: # Allow manual trigger
 
 jobs:
   ping-supabase:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping Supabase
+      - name: Ping Supabase directly
         run: |
           response=$(curl -s -o /dev/null -w "%{http_code}" \
             "${{ secrets.SUPABASE_URL }}/rest/v1/scores?select=count&limit=1" \
             -H "apikey: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
             -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}")
 
-          echo "Response code: $response"
+          echo "Direct Supabase response: $response"
 
           if [ "$response" -ge 200 ] && [ "$response" -lt 300 ]; then
             echo "Supabase is alive!"
           else
             echo "Warning: Unexpected response code $response"
             exit 1
+          fi
+
+      - name: Ping health endpoint
+        run: |
+          response=$(curl -s -o /dev/null -w "%{http_code}" \
+            "https://packmunderman.vercel.app/api/health")
+
+          echo "Health endpoint response: $response"
+
+          if [ "$response" -ge 200 ] && [ "$response" -lt 300 ]; then
+            echo "Health endpoint is alive!"
+          else
+            echo "Warning: Health endpoint returned $response"
           fi

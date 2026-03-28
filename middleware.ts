@@ -4,8 +4,12 @@ import type { NextRequest } from 'next/server'
 export function middleware(request: NextRequest) {
   const isAuthenticated = request.cookies.get('site-auth')?.value === 'authenticated'
 
-  // Allow access to login page and auth API
-  if (request.nextUrl.pathname === '/login' || request.nextUrl.pathname === '/api/auth') {
+  // Allow access to login page, auth API, and health check
+  if (
+    request.nextUrl.pathname === '/login' ||
+    request.nextUrl.pathname === '/api/auth' ||
+    request.nextUrl.pathname === '/api/health'
+  ) {
     return NextResponse.next()
   }
 

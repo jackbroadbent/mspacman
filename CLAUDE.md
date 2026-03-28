@@ -63,7 +63,7 @@ Password stored in environment variables only (not in code).
 ## Deployment
 
 - **GitHub:** https://github.com/jackbroadbent/mspacman
-- **Vercel:** https://packmuderman.vercel.app
+- **Vercel:** https://packmunderman.vercel.app
 - Deploy: `npx vercel --prod --yes`
 - Env vars managed via `npx vercel env` commands
 

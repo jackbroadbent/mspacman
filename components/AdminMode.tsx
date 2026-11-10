@@ -1,9 +1,9 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { MOCK_PLAYERS } from '@/lib/constants'
+import { PLAYERS } from '@/lib/constants'
 import { EditScoreData } from './LogPopup'
-import { LevelFruitsJson } from '@/lib/database.types'
+import { LevelFruitsJson } from '@/lib/types'
 
 interface ScoreEntry {
   id: string

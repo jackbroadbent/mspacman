@@ -5,8 +5,8 @@ import { PlayerSelector } from '@/components/PlayerSelector'
 import { ScoreInput } from '@/components/ScoreInput'
 import { LevelSelector } from '@/components/LevelSelector'
 import { FeatureToggles } from '@/components/FeatureToggles'
-import { MOCK_PLAYERS, LevelFruits, LevelFruitCounts, FruitKey } from '@/lib/constants'
-import { LevelFruitsJson } from '@/lib/database.types'
+import { PLAYERS, LevelFruits, LevelFruitCounts, FruitKey } from '@/lib/constants'
+import { LevelFruitsJson } from '@/lib/types'
 
 // Score data for editing
 export interface EditScoreData {
@@ -180,7 +180,7 @@ export function LogPopup({ isOpen, onClose, onSuccess, editScore }: LogPopupProp
         </div>
         <div className="popup-content">
           <PlayerSelector
-            players={MOCK_PLAYERS}
+            players={PLAYERS}
             selectedPlayerId={selectedPlayerId}
             onSelect={setSelectedPlayerId}
           />

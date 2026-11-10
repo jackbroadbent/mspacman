@@ -1,27 +1,18 @@
 import { NextResponse } from 'next/server'
-import { createSupabaseServerClient } from '@/lib/supabase'
+import { getScores } from '@/lib/sheets-db'
 
 export async function GET() {
   try {
-    const supabase = createSupabaseServerClient()
-    const { count, error } = await supabase
-      .from('scores')
-      .select('*', { count: 'exact', head: true })
-
-    if (error) {
-      return NextResponse.json(
-        { status: 'error', error: error.message },
-        { status: 500 }
-      )
-    }
-
+    const scores = await getScores()
     return NextResponse.json({
       status: 'ok',
-      supabase: 'connected',
-      scores: count,
+      database: 'google-sheets',
+      scores: scores.length,
+      latest: scores[0]?.createdAt ?? null,
       timestamp: new Date().toISOString(),
     })
   } catch (e) {
+    console.error('Health check error:', e)
     return NextResponse.json(
       { status: 'error', error: e instanceof Error ? e.message : 'Unknown error' },
       { status: 500 }

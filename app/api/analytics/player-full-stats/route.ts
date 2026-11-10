@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createSupabaseServerClient } from '@/lib/supabase'
+import { getScores } from '@/lib/sheets-db'
+import { requireAuth } from '@/lib/api-auth'
 import { PlayerFullStats } from '@/lib/analytics.types'
 import { FIXED_LEVELS, FruitKey } from '@/lib/constants'
 
@@ -13,60 +13,33 @@ function getFruitForLevel(level: number): FruitKey | null {
 }
 
 export async function GET(request: Request) {
-  const cookieStore = await cookies()
-  const isAuthenticated = cookieStore.get('site-auth')?.value === 'authenticated'
-
-  if (!isAuthenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const unauthorized = await requireAuth()
+  if (unauthorized) return unauthorized
 
   try {
     const { searchParams } = new URL(request.url)
-    const playerId = searchParams.get('playerId')
+    const playerId = searchParams.get('playerId')?.trim().toUpperCase()
 
     if (!playerId) {
       return NextResponse.json({ error: 'playerId is required' }, { status: 400 })
     }
 
-    const supabase = createSupabaseServerClient()
+    const everyScore = await getScores()
 
-    // Get player info
-    const { data: player, error: playerError } = await supabase
-      .from('players')
-      .select('id, name')
-      .eq('id', playerId)
-      .single()
+    // All scores for this player, newest first
+    const allScores = everyScore
+      .filter(s => s.playerId === playerId)
+      .map(s => ({ score: s.score, level: s.level, created_at: s.createdAt }))
 
-    if (playerError || !player) {
-      return NextResponse.json({ error: 'Player not found' }, { status: 404 })
-    }
-
-    // Get all scores for this player
-    const { data: scores, error: scoresError } = await supabase
-      .from('scores')
-      .select('id, score, level, created_at')
-      .eq('player_id', playerId)
-      .order('created_at', { ascending: false })
-
-    if (scoresError) {
-      console.error('Scores query error:', scoresError)
-      return NextResponse.json({ error: 'Failed to fetch scores' }, { status: 500 })
-    }
-
-    const allScores = scores || []
     if (allScores.length === 0) {
       return NextResponse.json({ error: 'No scores found for player' }, { status: 404 })
     }
-
-    // Get rank by high score
-    const { data: rankData } = await supabase
-      .from('scores')
-      .select('player_id, score')
-      .order('score', { ascending: false })
+    const player = { id: playerId, name: playerId }
+    const rankData = everyScore.map(s => ({ player_id: s.playerId, score: s.score }))
 
     // Find unique players and their best scores
     const playerBestScores = new Map<string, number>()
-    for (const score of rankData || []) {
+    for (const score of rankData) {
       if (!playerBestScores.has(score.player_id) || score.score > playerBestScores.get(score.player_id)!) {
         playerBestScores.set(score.player_id, score.score)
       }

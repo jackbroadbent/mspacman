@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { createSupabaseServerClient } from '@/lib/supabase'
+import { getScores } from '@/lib/sheets-db'
+import { requireAuth } from '@/lib/api-auth'
 import { PlayerStats } from '@/lib/analytics.types'
-import { FIXED_LEVELS, FruitKey } from '@/lib/constants'
+import { FIXED_LEVELS, FruitKey, PLAYERS } from '@/lib/constants'
 
 // Get fruit for a level (fixed for 1-7, needs lookup for 8+)
 function getFruitForLevel(level: number): FruitKey | null {
@@ -14,54 +14,18 @@ function getFruitForLevel(level: number): FruitKey | null {
 }
 
 export async function GET() {
-  const cookieStore = await cookies()
-  const isAuthenticated = cookieStore.get('site-auth')?.value === 'authenticated'
-
-  if (!isAuthenticated) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  }
+  const unauthorized = await requireAuth()
+  if (unauthorized) return unauthorized
 
   try {
-    const supabase = createSupabaseServerClient()
-
-    // Get all players
-    const { data: players, error: playersError } = await supabase
-      .from('players')
-      .select('id, name, is_active')
-      .eq('is_active', true)
-
-    if (playersError) {
-      console.error('Players query error:', playersError)
-      return NextResponse.json({ error: 'Failed to fetch players' }, { status: 500 })
-    }
-
-    // Get all scores using pagination (Supabase has a hard 1000 row limit per request)
-    let allScores: { id: string; player_id: string; score: number; level: number; created_at: string }[] = []
-    let offset = 0
-    const pageSize = 1000
-    let hasMore = true
-
-    while (hasMore) {
-      const { data: pageScores, error: scoresError } = await supabase
-        .from('scores')
-        .select('id, player_id, score, level, created_at')
-        .order('created_at', { ascending: false })
-        .range(offset, offset + pageSize - 1)
-
-      if (scoresError) {
-        console.error('Scores query error:', scoresError)
-        return NextResponse.json({ error: 'Failed to fetch scores' }, { status: 500 })
-      }
-
-      if (pageScores && pageScores.length > 0) {
-        allScores = allScores.concat(pageScores)
-        offset += pageSize
-        hasMore = pageScores.length === pageSize
-      } else {
-        hasMore = false
-      }
-    }
-
+    const players = PLAYERS.filter(p => p.isActive)
+    // Newest first
+    const allScores = (await getScores()).map(s => ({
+      player_id: s.playerId,
+      score: s.score,
+      level: s.level,
+      created_at: s.createdAt,
+    }))
 
     // Process each player
     const playerStatsMap: Map<string, {
@@ -76,7 +40,7 @@ export async function GET() {
     }> = new Map()
 
     // Initialize player data
-    for (const player of players || []) {
+    for (const player of players) {
       playerStatsMap.set(player.id, {
         playerId: player.id,
         playerName: player.name,
@@ -90,7 +54,7 @@ export async function GET() {
     }
 
     // Process scores
-    for (const score of allScores || []) {
+    for (const score of allScores) {
       const playerData = playerStatsMap.get(score.player_id)
       if (!playerData) continue
 
@@ -126,7 +90,7 @@ export async function GET() {
       const averageScore = Math.round(data.totalScore / data.totalGames)
 
       // Calculate 50-game moving average (or all games if less than 50)
-      const playerScores = (allScores || [])
+      const playerScores = allScores
         .filter(s => s.player_id === data.playerId)
         .slice(0, 50)
 

@@ -64,22 +64,35 @@ export const GAME_FEATURES = [
   { id: 'footsmans', name: 'Footsmans' },
 ] as const
 
-// Players with Supabase UUIDs (TODO: fetch from API instead of hardcoding)
-export const MOCK_PLAYERS = [
-  { id: '529dd0be-df3a-4135-a86d-dd8ede641eb8', name: 'JMB', isActive: true },
-  { id: '03ab4e1a-9c19-4e1a-b5b8-887c977479e9', name: 'HSG', isActive: true },
-  { id: 'd5d3e5b6-cadf-4459-ae2d-7940e9c2ad07', name: 'SMB', isActive: true },
-  { id: 'b11b4e5c-4b90-437e-8b9b-bd612a1a48b0', name: 'ACM', isActive: true },
-  { id: 'a88980e3-38c0-41f6-85cd-6d1eb56126f6', name: 'CBC', isActive: true },
-  { id: '43776f37-0114-485a-b7fa-4316c1c1b6ab', name: 'DTG', isActive: true },
-  { id: 'caffa5c0-d14d-4962-903c-e4de55eec21e', name: 'RTA', isActive: true },
-  { id: '58eec6b2-5842-445a-9378-e9917a1d9f5e', name: 'MLK', isActive: true },
-  { id: 'd05ec150-8cf8-490a-8f41-d68876d54a73', name: 'SRG', isActive: false },
-  { id: '47da6ea5-6019-4eca-9664-99deb3b19c0e', name: 'NVB', isActive: false },
-  { id: '948c734e-ba26-49c9-a50b-5d3ec639e1bc', name: 'LEZ', isActive: false },
-  { id: '6bcaebce-b38f-4f6c-99cb-602a6fe4d5fd', name: 'DPC', isActive: false },
-  { id: '234503d3-0160-4d6a-a5ad-71101633c33f', name: 'BSA', isActive: false },
-  { id: '061bcb4c-d9f1-4df5-9ea2-b5348253355c', name: 'LD', isActive: false },
+// Players, keyed by the initials used in the sheet's P_ID column
+export const PLAYERS = [
+  { id: 'JMB', name: 'JMB', isActive: true },
+  { id: 'HSG', name: 'HSG', isActive: true },
+  { id: 'SMB', name: 'SMB', isActive: true },
+  { id: 'ACM', name: 'ACM', isActive: true },
+  { id: 'CBC', name: 'CBC', isActive: true },
+  { id: 'DTG', name: 'DTG', isActive: true },
+  { id: 'RTA', name: 'RTA', isActive: true },
+  { id: 'MLK', name: 'MLK', isActive: true },
+  { id: 'SRG', name: 'SRG', isActive: false },
+  { id: 'NVB', name: 'NVB', isActive: false },
+  { id: 'LEZ', name: 'LEZ', isActive: false },
+  { id: 'DPC', name: 'DPC', isActive: false },
+  { id: 'BSA', name: 'BSA', isActive: false },
+  { id: 'LD', name: 'LD', isActive: false },
+  // Historical players from the sheet (shown under "more" in the log form)
+  { id: 'JCH', name: 'JCH', isActive: false },
+  { id: 'ZRF', name: 'ZRF', isActive: false },
+  { id: 'KHM', name: 'KHM', isActive: false },
+  { id: 'HBG', name: 'HBG', isActive: false },
+  { id: 'IPD', name: 'IPD', isActive: false },
+  { id: 'CBG', name: 'CBG', isActive: false },
+  { id: 'AMK', name: 'AMK', isActive: false },
+  { id: 'BCW', name: 'BCW', isActive: false },
+  { id: 'KBO', name: 'KBO', isActive: false },
+  { id: 'LMB', name: 'LMB', isActive: false },
+  { id: 'WBC', name: 'WBC', isActive: false },
+  { id: 'MRC', name: 'MRC', isActive: false },
 ]
 
 // Tier thresholds for level selector

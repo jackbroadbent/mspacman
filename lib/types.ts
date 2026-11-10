@@ -22,3 +22,6 @@ export interface LevelInfo {
   fruit?: FruitKey  // Only set for levels 1-7
   isRandom: boolean
 }
+
+// Fruits eaten per level (levels 8+): keys are level numbers as strings, values are [fruit1, fruit2]
+export type LevelFruitsJson = Record<string, [FruitKey | null, FruitKey | null]>
